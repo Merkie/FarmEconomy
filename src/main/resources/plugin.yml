@@ -1,0 +1,12 @@
+name: FarmEconomy
+version: '${project.version}'
+main: com.archercalder.farmeconomy.FarmEconomy
+api-version: '1.20'
+commands:
+  bal:
+    description: "Check your balance"
+    usage: "/bal"
+    aliases: [ balance ]
+  sellall:
+    description: "Sell all items in your inventory"
+    usage: "/sellall"
