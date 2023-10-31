@@ -5,15 +5,25 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import com.archercalder.farmeconomy.CropData;
+
 import org.bukkit.block.data.Ageable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 public class CropBreakListener implements Listener {
+  private HashMap<Material, CropData> cropDataMap;
+
+  public CropBreakListener(HashMap<Material, CropData> cropDataMap) {
+    this.cropDataMap = cropDataMap;
+  }
+
   @EventHandler
   public void onCropBreak(BlockBreakEvent event) {
     // Check if the player is in survival mode
@@ -26,38 +36,46 @@ public class CropBreakListener implements Listener {
 
     // Check if the block is a crop
     if (isCrop(type)) {
-      final boolean isAgeableCrop = isAgeableCrop(type);
+      final CropData cropData = cropDataMap.get(type);
+
       boolean isFullyGrown = false;
-      if (isAgeableCrop) {
+      if (cropData.isAgeable()) {
         Ageable ageable = (Ageable) block.getBlockData();
         isFullyGrown = ageable.getAge() == ageable.getMaximumAge();
       }
 
-      if (!isAgeableCrop || isFullyGrown) {
-        // The crop is fully grown, modify the item drop
-        event.setDropItems(false); // Prevent the default drop
-        ItemStack droppedItem = new ItemStack(type, 1); // Modify this if different crops drop different items
-        ItemMeta meta = droppedItem.getItemMeta();
+      if (!cropData.isAgeable() || isFullyGrown) {
+        // Prevent the default drop
+        event.setDropItems(false);
 
+        // Create itemstack for organic produce drops
+        ItemStack droppedItem = new ItemStack(cropData.getCropMaterial(), getDropAmount(type));
+
+        // Set the lore
+        ItemMeta meta = droppedItem.getItemMeta();
         ArrayList<String> lore = new ArrayList<String>();
         lore.add("§r§aOrganic Produce");
         meta.setLore(lore);
         droppedItem.setItemMeta(meta);
 
-        // Drop the modified item
+        // Drop the item stack for the crops
         block.getWorld().dropItemNaturally(block.getLocation(), droppedItem);
+
+        if (cropData.getSeedMaterial() != null) {
+          // Create and drop the item stack for the seeds
+          ItemStack seedStack = new ItemStack(cropData.getSeedMaterial(), 1);
+          block.getWorld().dropItemNaturally(block.getLocation(), seedStack);
+        }
       }
     }
   }
 
   private boolean isCrop(Material type) {
-    // Add other crops as needed
-    return type == Material.WHEAT || type == Material.CARROTS || type == Material.POTATOES ||
-        type == Material.BEETROOTS || type == Material.SUGAR_CANE;
+    return cropDataMap.containsKey(type);
   }
 
-  private boolean isAgeableCrop(Material type) {
-    return type == Material.WHEAT || type == Material.CARROTS || type == Material.POTATOES ||
-        type == Material.BEETROOTS;
+  private int getDropAmount(Material type) {
+    CropData cropData = cropDataMap.get(type);
+    return (int) (Math.random() * (cropData.getMaxDrop() - cropData.getMinDrop() + 1) + cropData.getMinDrop());
   }
 }

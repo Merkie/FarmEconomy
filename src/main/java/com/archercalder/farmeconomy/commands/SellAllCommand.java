@@ -1,5 +1,6 @@
 package com.archercalder.farmeconomy.commands;
 
+import com.archercalder.farmeconomy.CropData;
 import com.archercalder.farmeconomy.FarmEconomy;
 
 import java.util.List;
@@ -31,23 +32,21 @@ public class SellAllCommand implements TabExecutor {
             int totalSaleValue = 0;
 
             for (ItemStack item : items) {
-                if (item != null && item.getType() == Material.WHEAT) {
-                    if (isOrganicProduced(item)) {
-                        totalSaleValue += item.getAmount() * 2;
-                    } else {
-                        totalSaleValue += item.getAmount();
+                if (item != null) {
+                    CropData cropData = getCropData(item.getType());
+                    if (cropData != null) {
+                        totalSaleValue += getCropSalePrice(item);
+                        soldItemCount += item.getAmount();
+                        player.getInventory().removeItem(item);
                     }
-
-                    soldItemCount += item.getAmount();
-                    player.getInventory().removeItem(item);
                 }
             }
 
             if (soldItemCount > 0) {
                 plugin.balanceManager.updatePlayerBalanceByUUID(player.getUniqueId(), totalSaleValue);
-                player.sendMessage(ChatColor.GREEN + "Sold " + soldItemCount + " wheat for $" + totalSaleValue);
+                player.sendMessage(ChatColor.GREEN + "Sold " + soldItemCount + " items for $" + totalSaleValue);
             } else {
-                player.sendMessage(ChatColor.RED + "You have no wheat to sell!");
+                player.sendMessage(ChatColor.RED + "You have no items to sell!");
             }
         } else {
             sender.sendMessage(ChatColor.RED + "This command can only be run by a player.");
@@ -74,5 +73,28 @@ public class SellAllCommand implements TabExecutor {
         }
 
         return false;
+    }
+
+    private CropData getCropData(Material type) {
+        for (Material key : plugin.cropDataMap.keySet()) {
+            if (key == type) {
+                return plugin.cropDataMap.get(key);
+            } else if (plugin.cropDataMap.get(key).getCropMaterial() == type) {
+                return plugin.cropDataMap.get(key);
+            }
+        }
+
+        return null;
+    }
+
+    private int getCropSalePrice(ItemStack item) {
+        Material type = item.getType();
+        int amount = item.getAmount();
+
+        if (isOrganicProduced(item)) {
+            return (amount * getCropData(type).getSalePrice()) * 2;
+        } else {
+            return (amount * getCropData(type).getSalePrice());
+        }
     }
 }
