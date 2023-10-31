@@ -2,6 +2,7 @@ package com.archercalder.farmeconomy;
 
 import com.archercalder.farmeconomy.commands.BalanceCommand;
 import com.archercalder.farmeconomy.commands.SellAllCommand;
+import com.archercalder.farmeconomy.organicproduce.OrganicProduce;
 import com.archercalder.farmeconomy.sqlite.BalanceManager;
 import com.archercalder.farmeconomy.sqlite.SQLite;
 
@@ -14,6 +15,8 @@ public final class FarmEconomy extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        new OrganicProduce(this);
+
         sqlite = new SQLite(this);
         balanceManager = new BalanceManager(this);
         this.getCommand("bal").setExecutor(new BalanceCommand(this));
