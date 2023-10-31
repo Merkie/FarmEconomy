@@ -1,6 +1,6 @@
 # FarmEconomy
 
-FarmEconomy is a Minecraft plugin (Spigot/PaperMC 1.20.X) that seeks to add a rich economy via incentivizing farming in a survival-like experience.
+FarmEconomy is a Minecraft plugin (Spigot/PaperMC 1.20.X) that seeks to add a rich economy by incentivizing farming in a survival-like experience.
 
 ### Features:
 - Basic Economy Commands
