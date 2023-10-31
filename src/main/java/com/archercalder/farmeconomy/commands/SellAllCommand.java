@@ -4,14 +4,14 @@ import com.archercalder.farmeconomy.FarmEconomy;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
+// import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class SellAllCommand implements CommandExecutor, TabExecutor {
+public class SellAllCommand implements TabExecutor {
     private FarmEconomy plugin;
 
     public SellAllCommand(FarmEconomy plugin) {
@@ -19,7 +19,8 @@ public class SellAllCommand implements CommandExecutor, TabExecutor {
     }
 
     @Override
-    public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, @NonNull String[] args) {
+    public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label,
+            @NonNull String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             ItemStack[] items = player.getInventory().getContents();
@@ -35,7 +36,7 @@ public class SellAllCommand implements CommandExecutor, TabExecutor {
 
             if (wheatCount > 0) {
                 // Assume 1 wheat is worth $1, update player balance accordingly
-                plugin.addPlayerBalanceById(player.getUniqueId(), wheatCount);
+                plugin.balanceManager.updatePlayerBalanceByUUID(player.getUniqueId(), wheatCount);
 
                 // Send a confirmation message to the player
                 player.sendMessage(ChatColor.GREEN + "Sold " + wheatCount + " wheat for $" + wheatCount);
@@ -51,7 +52,8 @@ public class SellAllCommand implements CommandExecutor, TabExecutor {
     }
 
     @Override
-    public java.util.List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String alias, @NonNull String[] args) {
+    public java.util.List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command,
+            @NonNull String alias, @NonNull String[] args) {
         return java.util.Collections.emptyList();
     }
 }
