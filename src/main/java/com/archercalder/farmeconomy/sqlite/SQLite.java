@@ -18,8 +18,6 @@ public class SQLite {
 
   private void establishSqliteConnection() {
     try {
-      // Ensure that we have the sqlite driver, this will throw an exception if we
-      // don't
       Class.forName("org.sqlite.JDBC");
 
       if (!plugin.getDataFolder().exists()) {
