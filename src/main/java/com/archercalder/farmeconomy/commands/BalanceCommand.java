@@ -25,7 +25,7 @@ public class BalanceCommand implements TabExecutor {
 
             int balance = plugin.balanceManager.getPlayerBalanceByUUID(player.getUniqueId());
 
-            player.sendMessage(ChatColor.GREEN + "Your balance is: " + balance);
+            player.sendMessage(ChatColor.GREEN + "Your balance is: $" + balance);
         }
         return true;
     }
